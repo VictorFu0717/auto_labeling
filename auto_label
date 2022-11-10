@@ -37,7 +37,7 @@ if __name__ == '__main__':
     print("Default tracking algoritm is CSRT \n"
         "Available tracking algorithms are:\n")
     for t in trackerTypes:
-      print(t)
+        print(t)
 
     trackerType = "CSRT"
 
@@ -45,8 +45,10 @@ if __name__ == '__main__':
     videoPath = "C:/Users/victor/PycharmProjects/yolov5/Auto_labeling/sample_1.mp4"
 
     # Create a video capture object to read videos
-    cap = cv2.VideoCapture(videoPath)
-
+    cap = cv2.VideoCapture(0)
+    # 設定擷取影像的尺寸大小
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
     # Read first frame
 
     # quit if unable to read the video file
@@ -82,15 +84,16 @@ if __name__ == '__main__':
                 print("Press any other key to select next object")
                 k = cv2.waitKey(0) & 0xFF
                 if (k == 113):  # q is pressed
-                  break
+                    break
             print('Selected bounding boxes {}'.format(bboxes))
 
         # Create MultiTracker object
-            multiTracker = cv2.MultiTracker_create()
+            multiTracker = cv2.legacy.MultiTracker_create()
 
             # Initialize MultiTracker
             for bbox in bboxes:
-                multiTracker.add(createTrackerByName(trackerType), frame, bbox)
+                tracker = cv2.legacy.TrackerCSRT_create()
+                multiTracker.add(tracker, frame, bbox)
 
             # Process video and track objects
             while cap.isOpened():
@@ -98,9 +101,9 @@ if __name__ == '__main__':
                 success, frame = cap.read()
 
                 if not success:
-                  break
+                    break
 
-                cv2.imwrite(f"C:/Users/victor/PycharmProjects/yolov5/Auto_labeling/test_images/{count}.jpg", frame)
+                # cv2.imwrite(f"C:/Users/victor/PycharmProjects/yolov5/Auto_labeling/test_images/{count}.jpg", frame)
                 # get updated location of objects in subsequent frames
                 success, boxes = multiTracker.update(frame)
 
@@ -129,13 +132,13 @@ if __name__ == '__main__':
                     n_w = w / W
                     n_h = h / H
                     cv2.rectangle(frame, (x,y), (x+w, y+h), colors[i], 2, 1)
-                    with open(f"C:/Users/victor/PycharmProjects/yolov5/Auto_labeling/test_labels/{count}.txt", "a",
-                              encoding="utf-8") as f:
-                        f.write(f"{i} {n_x} {n_y} {n_w} {n_h}\n")
+                    # with open(f"C:/Users/victor/PycharmProjects/yolov5/Auto_labeling/test_labels/{count}.txt", "a",
+                    #           encoding="utf-8") as f:
+                    #     f.write(f"{i} {n_x} {n_y} {n_w} {n_h}\n")
 
                     # show frame
                 cv2.imshow('Frame', frame)
-                cv2.imwrite(f"C:/Users/victor/PycharmProjects/yolov5/Auto_labeling/test_dataset/{count}.jpg", frame)
+                # cv2.imwrite(f"C:/Users/victor/PycharmProjects/yolov5/Auto_labeling/test_dataset/{count}.jpg", frame)
                 # print(count)
 
                     # quit on ESC button
