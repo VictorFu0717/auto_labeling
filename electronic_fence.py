@@ -87,7 +87,7 @@ while(cap.isOpened()):
 
   mask = frame.copy()
   mask = cv2.cvtColor(mask, cv2.COLOR_BGR2GRAY)
-  # 畫出等高線（除錯用）
+  # 製作遮罩
   cv2.drawContours(mask, cnts, -1, 0, -1)
   cv2.imshow('mask',mask)
 
