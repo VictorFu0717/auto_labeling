@@ -59,21 +59,22 @@ while(cap.isOpened()):
   retentateTimerMapTmp = np.zeros((height, width, 1), dtype="uint8")
   if len(cnts) != 0:
     for c in cnts:
-
       # 忽略太小的區域
       if cv2.contourArea(c) > 800:
-        # 偵測到物體，可以自己加上處理的程式碼在這裡...
-
         # 計算等高線的外框範圍
         (x, y, w, h) = cv2.boundingRect(c)
         retentateTimerMapTmp[y:y + h,x:x + w] = 255
-        retentateTimerMap[y:y + h,x:x + w] += 2
+        retentateTimerMap[y:y + h,x:x + w] += 1 # 計次
+        # 超過100次判定為遺留物
         if (retentateTimerMap >= 100).any():
+          # 偵測到遺留物，可以自己加上處理的程式碼在這裡...
+
           print("alarm")
           cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
   retentateTimerMap[retentateTimerMapTmp != 255] //= 2
 
+  # 做遮罩，將遺留物的部分做成遮罩，停止更新，以免遺留物和背景融為一體；若未出現遺留物，初始化遮罩
   mask = np.ones((height,width,1), dtype = "uint8")*255
   if (retentateTimerMapTmp == 255).any():
     cv2.drawContours(mask, cnts, -1, 0, -1)
