@@ -74,7 +74,7 @@ while(cap.isOpened()):
 
   retentateTimerMap[retentateTimerMapTmp != 255] //= 2
 
-  # 做遮罩，將遺留物的部分做成遮罩，停止更新，以免遺留物和背景融為一體；若未出現遺留物，初始化遮罩
+  # 做遮罩，將遺留物的部分做成遮罩，停止更新，以免遺留物和背景融為一體；若未出現遺留物，初始化遮罩，去除遮罩上的雜訊
   mask = np.ones((height,width,1), dtype = "uint8")*255
   if (retentateTimerMapTmp == 255).any():
     cv2.drawContours(mask, cnts, -1, 0, -1)
