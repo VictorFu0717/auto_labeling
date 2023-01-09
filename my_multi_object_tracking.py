@@ -42,28 +42,28 @@ if __name__ == '__main__':
     trackerType = "CSRT"
 
     # Set video to load
-    videoPath = "C:/Users/victor/PycharmProjects/yolov5/Auto_labeling/sample_1.mp4"
-
+    videoPath = "C:/Users/victor/PycharmProjects/yolov5/Auto_labeling/7.mp4"
     # Create a video capture object to read videos
-    cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture(videoPath)
     # 設定擷取影像的尺寸大小
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+    # cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+    # cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
     # Read first frame
 
     # quit if unable to read the video file
 
-
     ## Select boxes
     bboxes = []
     colors = []
-    count = 0
+    count = 1
+    class_list = []
 
 
 
     while True:
         success, frame = cap.read()
         cv2.imshow("Frame", frame)
+        # time.sleep(0.1)
         key = cv2.waitKey(1) & 0xFF
         (H, W) = frame.shape[:2]
 
@@ -77,6 +77,8 @@ if __name__ == '__main__':
                 # draw bounding boxes over objects
                 # selectROI's default behaviour is to draw box starting from the center
                 # when fromCenter is set to false, you can draw box starting from top left corner
+                class_id = input('input the class_id : ')
+                class_list.append(eval(class_id))
                 bbox = cv2.selectROI('Frame', frame)
                 bboxes.append(bbox)
                 colors.append((randint(64, 255), randint(64, 255), randint(64, 255)))
@@ -102,8 +104,8 @@ if __name__ == '__main__':
 
                 if not success:
                     break
-
-                # cv2.imwrite(f"C:/Users/victor/PycharmProjects/yolov5/Auto_labeling/test_images/{count}.jpg", frame)
+                if count % 3 == 0:
+                    cv2.imwrite(f"C:/Users/victor/PycharmProjects/yolov5/Auto_labeling/test_images/{count}.jpg", frame)
                 # get updated location of objects in subsequent frames
                 success, boxes = multiTracker.update(frame)
 
@@ -114,11 +116,11 @@ if __name__ == '__main__':
                     ("FPS", fps),
                 ]
                 # loop over the info tuples and draw them on our frame
-                for (i, (k, v)) in enumerate(info):
-                    text = "{}: {}".format(k, v)
-                    cv2.putText(frame, text, (10, H - ((i * 20) + 20)),
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
-                print(fps)
+                # for (i, (k, v)) in enumerate(info):
+                #     text = "{}: {}".format(k, v)
+                #     cv2.putText(frame, text, (10, H - ((i * 20) + 20)),
+                #                 cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
+                print(class_list)
 
 
                 # draw tracked objects
@@ -132,14 +134,16 @@ if __name__ == '__main__':
                     n_w = w / W
                     n_h = h / H
                     cv2.rectangle(frame, (x,y), (x+w, y+h), colors[i], 2, 1)
-                    # with open(f"C:/Users/victor/PycharmProjects/yolov5/Auto_labeling/test_labels/{count}.txt", "a",
-                    #           encoding="utf-8") as f:
-                    #     f.write(f"{i} {n_x} {n_y} {n_w} {n_h}\n")
+                    if count % 3 == 0:
+                        with open(f"C:/Users/victor/PycharmProjects/yolov5/Auto_labeling/test_labels/{count}.txt", "a",
+                                  encoding="utf-8") as f:
+                            f.write(f"{class_list[i]} {n_x} {n_y} {n_w} {n_h}\n")
 
                     # show frame
                 cv2.imshow('Frame', frame)
-                # cv2.imwrite(f"C:/Users/victor/PycharmProjects/yolov5/Auto_labeling/test_dataset/{count}.jpg", frame)
-                # print(count)
+                if count % 3 == 0:
+                    cv2.imwrite(f"C:/Users/victor/PycharmProjects/yolov5/Auto_labeling/test_dataset/{count}.jpg", frame)
+                print(count)
 
                     # quit on ESC button
                 if cv2.waitKey(1) & 0xFF == 27:  # Esc pressed
@@ -148,3 +152,6 @@ if __name__ == '__main__':
 
                 # initialize the set of information we'll be displaying on
                 # the frame
+        # quit on ESC button
+        if cv2.waitKey(1) & 0xFF == 27:  # Esc pressed
+            break
