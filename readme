@@ -1,3 +1,3 @@
 pip install opencv-python
 pip install opencv-contrib-python
-output yolo format '.txt'
+output yolov5 label format '.txt'
